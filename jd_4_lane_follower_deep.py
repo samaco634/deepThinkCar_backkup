@@ -23,13 +23,15 @@ for i in range(30):
             print("can't find lane...")
         else:
             print(angle_deep)
-            servo.servo[0].angle = angle_deep + servo_offset			
+            if angle_deep > 40 and angle_deep < 140:
+                servo.servo[0].angle = angle_deep + servo_offset	
+            		
             cv2.imshow("img_angle", img_angle)
             cv2.waitKey(1)
     else:
         print("cap error")
 
-motor.motor_move_forward(20)
+motor.motor_move_forward(30)
 
 
 while cap.isOpened():
@@ -39,14 +41,16 @@ while cap.isOpened():
         print("can't find lane...")
     else:
         print(angle_deep)
-        servo.servo[0].angle = angle_deep + servo_offset
+        if angle_deep > 30 and angle_deep < 160:
+            servo.servo[0].angle = angle_deep + servo_offset
         cv2.imshow("img_angle", img_angle)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
+motor.motor_stop()
 cap.release()
 cv2.destroyAllWindows()
 
 
 
         
+
