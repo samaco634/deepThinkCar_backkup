@@ -5,83 +5,79 @@ import math
 import datetime
 import sys
 
-_SHOW_IMAGE = False
+show_image = False
 class JdOpencvLaneDetect(object):
     def __init__(self):
         self.curr_steering_angle = 90
 
     def get_lane(self, frame):
-        _show_image("orignal", frame)
-        lane_lines, frame = _detect_lane(frame)
+        show_image("orignal", frame)
+        lane_lines, frame = detect_lane(frame)
         return lane_lines, frame
 
     def get_steering_angle(self, img_lane, lane_lines):
         if len(lane_lines) == 0:
             return 0, None
-        new_steering_angle = _compute_steering_angle(img_lane, lane_lines)
-        self.curr_steering_angle = _stabilize_steering_angle(self.curr_steering_angle, new_steering_angle, len(lane_lines))
+        new_steering_angle = compute_steering_angle(img_lane, lane_lines)
+        self.curr_steering_angle = stabilize_steering_angle(self.curr_steering_angle, new_steering_angle, len(lane_lines))
 
-        curr_heading_image = _display_heading_line(img_lane, self.curr_steering_angle)
-        _show_image("heading", curr_heading_image)
+        curr_heading_image = display_heading_line(img_lane, self.curr_steering_angle)
+        show_image("heading", curr_heading_image)
 
         return self.curr_steering_angle, curr_heading_image
 
 ############################
 # Frame processing steps
 ############################
-def _detect_lane(frame):
+def detect_lane(frame):
     logging.debug('detecting lane lines...')
-    edges = _detect_edges(frame)
-    _show_image('edges', edges)
+    edges = detect_edges(frame)
+    show_image('edges', edges)
 
-    cropped_edges = _region_of_interest(edges)
-    _show_image('edges cropped', cropped_edges, True)
+    cropped_edges = region_of_interest(edges)
+    show_image('edges cropped', cropped_edges, True)
 
-    line_segments = _detect_line_segments(cropped_edges)
-    line_segment_image = _display_lines(frame, line_segments)
-    _show_image("line segments", line_segment_image)
+    line_segments = detect_line_segments(cropped_edges)
+    line_segment_image = display_lines(frame, line_segments)
+    show_image("line segments", line_segment_image)
 
-    lane_lines = _average_slope_intercept(frame, line_segments)
-    lane_lines_image = _display_lines(frame, lane_lines)
-    _show_image("lane lines images", lane_lines_image)
-    #lane_lines_resized = cv2.resize(lane_lines_image, dsize=(320, 180), interpolation=cv2.INTER_AREA)
-    #__show_image("lane lines", lane_lines_resized)
-
+    lane_lines = average_slope_intercept(frame, line_segments)
+    lane_lines_image = display_lines(frame, lane_lines)
+    show_image("lane lines images", lane_lines_image)
+  
     return lane_lines, lane_lines_image
 
-
-def _detect_edges(frame):
-    # filter for blue lane lines
+'''
+To improve red line detection
+1. change hue value: lower_red1[0], upper_red1[0], lower_red2[0], upper_red2[0]
+recommand values are 170 ~ 180 and 0 ~ 30. we use 2 masks.
+2. change saturation value: lower_red1[1], lower_red2[1]
+recommand values: 70 ~ 100
+3. change value value: lower_red1[1], lower_red2[1]
+recommand values: 30 ~ 100
+'''
+def detect_edges(frame):
+    # filter for red lane lines
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    _show_image("hsv", hsv)
-    # blue 
-    #lower_blue = np.array([80, 150, 0])
-    #upper_blue = np.array([110, 255, 255])
+    show_image("hsv", hsv)
     # red 
-    lower_blue1 = np.array([0, 80, 30])
-    upper_blue1 = np.array([30, 255, 255])
-    #lower_blue = np.array([130, 100, 20])
-    #upper_blue = np.array([180, 255, 255])
-    #black 
-    #lower_blue = np.array([0, 5, 50])
-    #upper_blue = np.array([179, 200, 255])
-    mask1 = cv2.inRange(hsv, lower_blue1, upper_blue1)
-    lower_blue2 = np.array([170, 80, 30])
-    upper_blue2 = np.array([180, 255, 255])
-
-    mask2 = cv2.inRange(hsv, lower_blue2, upper_blue2)
+    lower_red1 = np.array([0, 80, 80])
+    upper_red1 = np.array([30, 255, 255])
+    mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+    lower_red2 = np.array([170, 80, 80])
+    upper_red2 = np.array([180, 255, 255])
+    mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
     mask = mask1+mask2
 
-    _show_image("blue mask", mask, True)
+    show_image("blue mask", mask, True)
 
     # detect edges
-    #edges = cv2.Canny(mask, 200, 400)
     edges = cv2.Canny(mask, 200, 400)
-    _show_image("blue edge", edges)
+    show_image("blue edge", edges)
 
     return edges
 
-def _region_of_interest(canny):
+def region_of_interest(canny):
     height, width = canny.shape
     mask = np.zeros_like(canny)
 
@@ -94,11 +90,11 @@ def _region_of_interest(canny):
         (0, height),
     ]], np.int32)
     cv2.fillPoly(mask, polygon, 255)
-    _show_image("mask", mask)
+    show_image("mask", mask)
     masked_image = cv2.bitwise_and(canny, mask)
     return masked_image
 
-def _detect_line_segments(cropped_edges):
+def detect_line_segments(cropped_edges):
     # tuning min_threshold, minLineLength, maxLineGap is a trial and error process by hand
     rho = 1  # precision in pixel, i.e. 1 pixel
     angle = np.pi / 180  # degree in radian, i.e. 1 degree
@@ -108,12 +104,12 @@ def _detect_line_segments(cropped_edges):
     if line_segments is not None:
         for line_segment in line_segments:
             logging.debug('detected line_segment:')
-            logging.debug("%s of length %s" % (line_segment, _length_of_line_segment(line_segment[0])))
+            logging.debug("%s of length %s" % (line_segment, length_of_line_segment(line_segment[0])))
 
     return line_segments
 
 
-def _average_slope_intercept(frame, line_segments):
+def average_slope_intercept(frame, line_segments):
     """
     This function combines line segments into one or two lane lines
     If all line slopes are < 0: then we only have detected left lane
@@ -157,18 +153,18 @@ def _average_slope_intercept(frame, line_segments):
 
     left_fit_average = np.average(left_fit, axis=0)
     if len(left_fit) > 0:
-        lane_lines.append(_make_points(frame, left_fit_average))
+        lane_lines.append(make_points(frame, left_fit_average))
 
     right_fit_average = np.average(right_fit, axis=0)
     if len(right_fit) > 0:
-        lane_lines.append(_make_points(frame, right_fit_average))
+        lane_lines.append(make_points(frame, right_fit_average))
 
     logging.debug('lane lines: %s' % lane_lines)  # [[[316, 720, 484, 432]], [[1009, 720, 718, 432]]]
 
     return lane_lines
  
 
-def _compute_steering_angle(frame, lane_lines):
+def compute_steering_angle(frame, lane_lines):
     """ Find the steering angle based on lane line coordinate
         We assume that camera is calibrated to point to dead center
     """
@@ -199,7 +195,7 @@ def _compute_steering_angle(frame, lane_lines):
     return steering_angle
 
 
-def _stabilize_steering_angle(curr_steering_angle, new_steering_angle, num_of_lane_lines, max_angle_deviation_two_lines=5, max_angle_deviation_one_lane=1):
+def stabilize_steering_angle(curr_steering_angle, new_steering_angle, num_of_lane_lines, max_angle_deviation_two_lines=5, max_angle_deviation_one_lane=1):
     """
     Using last steering angle to stabilize the steering angle
     This can be improved to use last N angles, etc
@@ -225,7 +221,7 @@ def _stabilize_steering_angle(curr_steering_angle, new_steering_angle, num_of_la
 """
   Utility Functions
 """
-def _display_lines(frame, lines, line_color=(0, 255, 0), line_width=10):
+def display_lines(frame, lines, line_color=(0, 255, 0), line_width=10):
     line_image = np.zeros_like(frame)
     if lines is not None:
         for line in lines:
@@ -235,7 +231,7 @@ def _display_lines(frame, lines, line_color=(0, 255, 0), line_width=10):
     return line_image
 
 
-def _display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_width=5, ):
+def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_width=5, ):
     heading_image = np.zeros_like(frame)
     height, width, _ = frame.shape
 
@@ -259,17 +255,17 @@ def _display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_wi
     return heading_image
 
 
-def _length_of_line_segment(line):
+def length_of_line_segment(line):
     x1, y1, x2, y2 = line
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
 
-def _show_image(title, frame, show=_SHOW_IMAGE):
+def show_image(title, frame, show=show_image):
     if show:
         cv2.imshow(title, frame)
 
 
-def _make_points(frame, line):
+def make_points(frame, line):
     height, width, _ = frame.shape
     slope, intercept = line
     y1 = height  # bottom of the frame

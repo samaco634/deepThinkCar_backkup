@@ -7,7 +7,7 @@ from jd_car_motor_l9110 import JdCarMotorL9110
 
 # Servo object 
 servo = ServoKit(channels=16)
-# OpenCV line detector object 
+# OpenCV line detector object
 cv_detector = JdOpencvLaneDetect()
 # DC motor object 
 motor = JdCarMotorL9110()
