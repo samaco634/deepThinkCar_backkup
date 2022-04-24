@@ -4,7 +4,7 @@ from jd_deep_lane_detect import JdDeepLaneDetect
 from jd_car_motor_l9110 import JdCarMotorL9110
 import time
 
-deep_detector = JdDeepLaneDetect("./models/lane_navigation_final.h5")
+deep_detector = JdDeepLaneDetect("./models/LIW2_cv_lane_navigation_final.h5")
 motor = JdCarMotorL9110()
 servo = ServoKit(channels=16)
 
@@ -31,7 +31,7 @@ for i in range(30):
     else:
         print("cap error")
 
-motor.motor_move_forward(30)
+motor.motor_move_forward(20)
 
 
 while cap.isOpened():

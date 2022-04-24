@@ -59,12 +59,16 @@ while run:
         angle -= 5
         if angle < 40:
             angle = 40
+        cv2.imwrite("%s_%03d_%03d.png" % ("./data/RC",index, angle), img_org)
+        index += 1
     elif keys[pygame.K_RIGHT]:
         key = 'right'
         text7 = font.render(key,True,(255,255,255)) 
         angle += 5
         if angle > 150:
             angle = 150
+        cv2.imwrite("%s_%03d_%03d.png" % ("./data/RC",index, angle), img_org)
+        index += 1
     
     if keys[pygame.K_s]:
         key = 'start'
@@ -91,8 +95,6 @@ while run:
         print(angle)
         cv2.imshow("deepThinkCar", img_org)
         if isDriving == True:
-            cv2.imwrite("%s_%03d_%03d.png" % ("./data/RC",index, angle), img_org)
-            index += 1
             motor.motor_move_forward(30)
         else:
             motor.motor_stop()

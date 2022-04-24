@@ -5,7 +5,7 @@ from adafruit_servokit import ServoKit
 import RPi.GPIO as IO
 import time
 # offset value 
-offset = 0
+offset = 1
 # Servo 
 servo = ServoKit(channels=16)
 angle = 90

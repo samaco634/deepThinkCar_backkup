@@ -34,7 +34,7 @@ video_orig = cv2.VideoWriter('./data/car_video.avi', fourcc, 20.0, (320, 240))
 #video_orig = cv2.VideoWriter('./data/car_video_lane.avi', fourcc, 20.0, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Servo offset. You can get offset from calibration.py
-servo_offset = 0
+servo_offset = 1
 servo.servo[0].angle = 90 + servo_offset
 
 # Prepare real starting 
@@ -53,7 +53,7 @@ for i in range(30):
         print("camera error")
 
 # Start motor 
-motor.motor_move_forward(50)
+motor.motor_move_forward(30)
 
 # real driving routine 
 while True:
