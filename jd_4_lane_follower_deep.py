@@ -10,7 +10,7 @@ import time
 '''
 2. Creating object from classes
   1) Servo handling object from ServoKit class 
-  2) Deep laerning lane detecting object from JdDeepLaneDetect class 
+  2) Deep learning lane detecting object from JdDeepLaneDetect class 
   3) DC motor handling object form JdCarMotorL9110 class 
 '''
 # Deep learning detector object
