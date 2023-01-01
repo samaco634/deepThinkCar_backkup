@@ -37,7 +37,7 @@ and wheel control while motor stop.
 It will prevents mis-driving of deepThinkCar. 
 '''
 # Servo offset. You can get offset from calibration.py
-servo_offset = 5
+servo_offset = 0
 servo.servo[0].angle = 90 + servo_offset
 
 # Prepare real starting 
@@ -61,7 +61,7 @@ for i in range(30):
 5. Starting motor before real driving 
 '''
 # Start motor 
-motor.motor_move_forward(20)
+motor.motor_move_forward(30)
 
 '''
 6. Perform real driving
@@ -78,7 +78,7 @@ while cap.isOpened():
         print("can't find lane...")
     else:
         print(angle_deep)
-        if angle_deep > 30 and angle_deep < 150:
+        if angle_deep > 40 and angle_deep < 140:
             servo.servo[0].angle = angle_deep + servo_offset
         cv2.imshow("img_angle", img_angle)
     if cv2.waitKey(1) & 0xFF == ord('q'):

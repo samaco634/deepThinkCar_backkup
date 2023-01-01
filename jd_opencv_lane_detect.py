@@ -21,6 +21,7 @@ class JdOpencvLaneDetect(object):
         new_steering_angle = compute_steering_angle(img_lane, lane_lines)
         #self.curr_steering_angle = stabilize_steering_angle(self.curr_steering_angle, new_steering_angle, len(lane_lines))
         self.curr_steering_angle = new_steering_angle
+        
         curr_heading_image = display_heading_line(img_lane, self.curr_steering_angle)
         show_image("heading", curr_heading_image)
 
@@ -60,7 +61,8 @@ def detect_edges(frame):
     # filter for red lane lines
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     show_image("hsv", hsv)
-    # red 
+    # red
+    '''
     lower_red1 = np.array([0, 50, 50])
     upper_red1 = np.array([40, 255, 255])
     mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
@@ -68,13 +70,13 @@ def detect_edges(frame):
     upper_red2 = np.array([180, 255, 255])
     mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
     mask = mask1+mask2
+    '''
     
     #black
-    '''
     black_lower = np.array([0, 0, 0])
-    black_upper = np.array([180, 255, 30])
+    black_upper = np.array([180, 255, 70])
     mask = cv2.inRange(hsv, black_lower, black_upper)
-    '''
+
     show_image("blue mask", mask, True)
 
     # detect edges
@@ -90,8 +92,8 @@ def region_of_interest(canny):
     # only focus bottom half of the screen
     
     polygon = np.array([[
-        (0, height*(1/2)),
-        (width, height*(1/2)),
+        (0, height*(1/3)),
+        (width, height*(1/3)),
         (width, height),
         (0, height),
     ]], np.int32)
@@ -145,7 +147,6 @@ def average_slope_intercept(frame, line_segments):
             if slope < 0:
                 if x1 < left_region_boundary and x2 < left_region_boundary:
                     #left_fit.append((slope, intercept))
-                    #if slope < -0.75:
                     if slope < -0.3:
                         #print("left points:", x1, x2, y1, y2) 
                         #print("left slope", slope, "intercepts:", intercept)
@@ -153,7 +154,6 @@ def average_slope_intercept(frame, line_segments):
             else:
                 if x1 > right_region_boundary and x2 > right_region_boundary:
                     #right_fit.append((slope, intercept))
-                    #if slope > 0.75:
                     if slope > 0.3:
                         #print("right points:", x1, x2, y1, y2) 
                         #print("right slope", slope, "intercepts:", intercept)
@@ -193,7 +193,7 @@ def compute_steering_angle(frame, lane_lines):
         x_offset = (left_x2 + right_x2) / 2 - mid
 
     # find the steering angle, which is angle between navigation direction to end of center line
-    y_offset = int(height / 2)
+    y_offset = int(height / 3)
 
     angle_to_mid_radian = math.atan(x_offset / y_offset)  # angle (in radian) to center vertical line
     angle_to_mid_deg = int(angle_to_mid_radian * 180.0 / math.pi)  # angle (in degrees) to center vertical line
@@ -255,7 +255,7 @@ def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_wid
     x1 = int(width / 2)
     y1 = height
     x2 = int(x1 - height / 2 / math.tan(steering_angle_radian))
-    y2 = int(height / 2)
+    y2 = int(height / 3)
 
     cv2.line(heading_image, (x1, y1), (x2, y2), line_color, line_width)
     heading_image = cv2.addWeighted(frame, 0.8, heading_image, 1, 1)
@@ -277,7 +277,7 @@ def make_points(frame, line):
     height, width, _ = frame.shape
     slope, intercept = line
     y1 = height  # bottom of the frame
-    y2 = int(y1 * 1 / 2)  # make points from middle of the frame down
+    y2 = int(y1 * 1 / 3)  # make points from middle of the frame down
 
     # bound the coordinates within the frame
     x1 = max(-width, min(2 * width, int((y1 - intercept) / slope)))

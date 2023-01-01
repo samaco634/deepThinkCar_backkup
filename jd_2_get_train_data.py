@@ -48,8 +48,13 @@ while True:
             print("can't find lane...")
         else:
             # Generate labeling data. Steering angle is embedding in video file name
+            if angle > 140:
+                angle = 140
+            elif angle < 40:
+                angle = 40
+                
             cv2.imwrite("%s_%03d_%03d.png" % (video_file, index, angle), img_org)
-            index += 1	
+            index += 1
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     else:
