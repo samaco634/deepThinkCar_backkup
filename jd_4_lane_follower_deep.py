@@ -14,7 +14,7 @@ import time
   3) DC motor handling object form JdCarMotorL9110 class 
 '''
 # Deep learning detector object
-deep_detector = JdDeepLaneDetect("./models/LIW2_cv_lane_navigation_final.h5")
+deep_detector = JdDeepLaneDetect("./models/lane_navigation_check.h5")
 # DC motor object
 motor = JdCarMotorL9110()
 # Servo object 
@@ -78,7 +78,7 @@ while cap.isOpened():
         print("can't find lane...")
     else:
         print(angle_deep)
-        if angle_deep > 30 and angle_deep < 160:
+        if angle_deep > 30 and angle_deep < 150:
             servo.servo[0].angle = angle_deep + servo_offset
         cv2.imshow("img_angle", img_angle)
     if cv2.waitKey(1) & 0xFF == ord('q'):
