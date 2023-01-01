@@ -19,8 +19,8 @@ class JdOpencvLaneDetect(object):
         if len(lane_lines) == 0:
             return 0, None
         new_steering_angle = compute_steering_angle(img_lane, lane_lines)
-        self.curr_steering_angle = stabilize_steering_angle(self.curr_steering_angle, new_steering_angle, len(lane_lines))
-
+        #self.curr_steering_angle = stabilize_steering_angle(self.curr_steering_angle, new_steering_angle, len(lane_lines))
+        self.curr_steering_angle = new_steering_angle
         curr_heading_image = display_heading_line(img_lane, self.curr_steering_angle)
         show_image("heading", curr_heading_image)
 
@@ -68,7 +68,13 @@ def detect_edges(frame):
     upper_red2 = np.array([180, 255, 255])
     mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
     mask = mask1+mask2
-
+    
+    #black
+    '''
+    black_lower = np.array([0, 0, 0])
+    black_upper = np.array([180, 255, 30])
+    mask = cv2.inRange(hsv, black_lower, black_upper)
+    '''
     show_image("blue mask", mask, True)
 
     # detect edges
@@ -139,14 +145,16 @@ def average_slope_intercept(frame, line_segments):
             if slope < 0:
                 if x1 < left_region_boundary and x2 < left_region_boundary:
                     #left_fit.append((slope, intercept))
-                    if slope < -0.75:
+                    #if slope < -0.75:
+                    if slope < -0.3:
                         #print("left points:", x1, x2, y1, y2) 
                         #print("left slope", slope, "intercepts:", intercept)
                         left_fit.append((slope, intercept))
             else:
                 if x1 > right_region_boundary and x2 > right_region_boundary:
                     #right_fit.append((slope, intercept))
-                    if slope > 0.75:
+                    #if slope > 0.75:
+                    if slope > 0.3:
                         #print("right points:", x1, x2, y1, y2) 
                         #print("right slope", slope, "intercepts:", intercept)
                         right_fit.append((slope, intercept))
