@@ -34,14 +34,14 @@ class JdDeepLaneDetect(object):
         return int(steering_angle + 0.5) 
 
 def img_preprocess(image):
-    height, _, _ = image.shape
+    height, _, _ = image.shape # 240, 320
     # remove top half of the image. It is not necesary 
-    image = image[int(height/2):,:,:]
+    image = image[int(height/3):,:,:]  
     # Nvidia model said it is best to use YUV color space
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)  
-    image = cv2.GaussianBlur(image, (3,3), 0)
+    #image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)  
+    #image = cv2.GaussianBlur(image, (3,3), 0)
     # input image size (200,66) Nvidia model
-    image = cv2.resize(image, (200,66))
+    #image = cv2.resize(image, (200,66))
     # normalizing
     image = image / 255 
     return image
@@ -62,8 +62,8 @@ def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_wid
         steering_angle_radian = steering_angle / 180.0 * math.pi
         x1 = int(width / 2)
         y1 = height
-        x2 = int(x1 - height / 2 / math.tan(steering_angle_radian))
-        y2 = int(height / 2)
+        x2 = int(x1 - height / 3  / math.tan(steering_angle_radian))
+        y2 = int(height / 3)
 
         cv2.line(heading_image, (x1, y1), (x2, y2), line_color, line_width)
         heading_image = cv2.addWeighted(frame, 0.8, heading_image, 1, 1)
