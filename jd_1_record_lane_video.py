@@ -75,6 +75,10 @@ for i in range(30):
             pass
         else:
             print(angle)
+            if angle > 140:
+                angle = 140
+            elif angle < 40:
+                angle = 40
             servo.servo[0].angle = angle + servo_offset			
     else:
         print("camera error")
@@ -105,6 +109,10 @@ while True:
         else:
             cv2.imshow('lane', img_angle)
             print(angle)
+            if angle > 140:
+                angle = 140
+            elif angle < 40:
+                angle = 40
             servo.servo[0].angle = angle + servo_offset
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
