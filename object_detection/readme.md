@@ -1,4 +1,4 @@
-#Updating the firmware in both EEPROMs
+# Updating the firmware in both EEPROMs
 ```
 $ sudo apt-get update
 $ sudo apt-get full-upgrade
