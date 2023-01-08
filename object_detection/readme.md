@@ -1,3 +1,15 @@
+#Updating the firmware in both EEPROMs
+'''
+$ sudo apt-get update
+$ sudo apt-get full-upgrade
+$ sudo apt-get install rpi-eeprom
+# to get the current status
+$ sudo rpi-eeprom-update
+# to update the firmware
+$ sudo rpi-eeprom-update -a
+$ sudo reboot
+'''
+
 referenced from https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/raspberry_pi
 
 # TensorFlow Lite Python object detection example with Raspberry Pi
